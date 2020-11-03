@@ -1,5 +1,6 @@
 package com.EmployeePayrollDB;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -66,6 +67,57 @@ public class EmployeePayrollService {
 		if (ioService.equals(IOService.FILE_IO)) {
 			new EmployeeFileService().printData();
 		}
+	}
+	
+	public long countEntries(IOService ioService) {
+		long entries = 0;
+		if (ioService.equals(IOService.FILE_IO)) {
+			entries = new EmployeeFileService().countEntries();
+		}
+		System.out.println("No of Entries in File: " + entries);
+		return entries;
+	}
+
+	/**
+	 * Usecase2: Reading data from database table
+	 * 
+	 * @param ioService
+	 * @return
+	 * @throws SQLException
+	 * @throws DatabaseException 
+	 */
+	public List<Employee> readEmployeePayrollDBData(IOService ioService) throws DatabaseException, SQLException {
+		if (ioService.equals(IOService.DB_IO)) {
+			this.employeeList = new EmployeePayrollDB().readData();
+		}
+		return this.employeeList;
+	}
+
+	/**
+	 * Usecase3: Updating data in the table for "Terisa"
+	 * 
+	 * @param name
+	 * @param salary
+	 * @throws DatabaseException 
+	 */
+	public void updateEmployeeSalary(String name, double salary) throws DatabaseException {
+		int result = new EmployeePayrollDB().updateEmployeeData(name, salary);
+		if (result == 0)
+			return;
+		Employee employee = this.getEmployee(name);
+		if (employee != null)
+			employee.salary = salary;
+	}
+
+	private Employee getEmployee(String name) {
+		Employee employee = this.employeeList.stream().filter(employeeData -> employeeData.name.equals(name))
+				.findFirst().orElse(null);
+		return employee;
+	}
+
+	public boolean checkEmployeeDataSync(String name) throws SQLException, DatabaseException {
+		List<Employee> employeeList = new EmployeePayrollDB().getEmployeeData(name);
+		return employeeList.get(0).equals(getEmployee(name));
 	}
 
 }

@@ -8,8 +8,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EmployeePayrollDB {
 	
@@ -53,6 +55,37 @@ public class EmployeePayrollDB {
 			throw new SQLException("Unable to execute query");
 		}
 		return employeeData;
+	}
+	
+	/**
+	 * Usecase3: Function to update salary in the table for a particular person
+	 * 
+	 * @param name
+	 * @param salary
+	 * @return
+	 * @throws DatabaseException 
+	 */
+	private int updateEmployeeUsingStatement(String name, double salary) throws DatabaseException {
+		String sql = String.format("Update employee_payroll_service set salary = %.2f where name = '%s';", salary,
+				name);
+		int result = 0;
+		try (Connection connection = this.getConnection()) {
+			Statement statement = connection.createStatement();
+			result =  statement.executeUpdate(sql);
+		}
+		catch(SQLException e) {
+			throw new DatabaseException("Unable to update");
+		}
+		return result;
+	}
+
+	public List<Employee> getEmployeeData(String name) throws  DatabaseException, SQLException {
+		return readData().stream().filter(employee -> employee.name.equals(name)).collect(Collectors.toList());
+		
+	}
+
+	public int updateEmployeeData(String name, double salary) throws DatabaseException {
+		return this.updateEmployeeUsingStatement(name, salary);
 	}
 }
 	
