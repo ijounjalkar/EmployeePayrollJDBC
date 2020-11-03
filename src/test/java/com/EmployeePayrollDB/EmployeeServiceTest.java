@@ -10,6 +10,7 @@ import com.EmployeePayrollDB.EmployeePayrollService;
 import com.EmployeePayrollDB.EmployeePayrollService.IOService;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 public class EmployeeServiceTest {
@@ -29,5 +30,20 @@ public class EmployeeServiceTest {
 		employeePayrollService.readEmployeePayrollDBData(EmployeePayrollService.IOService.DB_IO);
 		boolean result = employeePayrollService.checkEmployeeDataSync("Terisa");
 		assertEquals(true,result);
+	}
+	
+	/**
+	 * Usecase5: to retrieve employees in the particular dates
+	 * 
+	 * @throws DatabaseException
+	 * @throws SQLException 
+	 */
+	@Test
+	public void givenEmployeePayrollInDB_WhenRetrievedForDateRange_ShouldMatchEmployeeCount() throws DatabaseException, SQLException {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		List<Employee> employeePayrollData = employeePayrollService.readEmployeePayrollDBData(IOService.DB_IO);
+		int result = employeePayrollService.getEmployeeForDateRange(LocalDate.of(2019, 01, 01),
+				LocalDate.of(2020, 01, 01));
+		assertEquals(3, result);
 	}
 }

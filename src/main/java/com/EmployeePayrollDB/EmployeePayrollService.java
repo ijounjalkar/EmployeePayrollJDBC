@@ -1,6 +1,7 @@
 package com.EmployeePayrollDB;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -118,6 +119,10 @@ public class EmployeePayrollService {
 	public boolean checkEmployeeDataSync(String name) throws SQLException, DatabaseException {
 		List<Employee> employeeList = new EmployeePayrollDB().getEmployeeData(name);
 		return employeeList.get(0).equals(getEmployee(name));
+	}
+	public int getEmployeeForDateRange(LocalDate start, LocalDate end) throws DatabaseException {
+		int result  = employeePayrollDB.getEmployeeForDateRange(start,end);
+		return result;
 	}
 
 }

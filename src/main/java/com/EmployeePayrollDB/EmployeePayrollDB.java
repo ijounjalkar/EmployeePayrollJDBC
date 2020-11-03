@@ -1,6 +1,7 @@
 package com.EmployeePayrollDB;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -127,6 +128,41 @@ public class EmployeePayrollDB {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Usecase4: Prepared Statement for the payroll database
+	 */
+	private void preparedStatementForEmployeeData() {
+		try {
+			Connection connection = this.getConnection();
+			String sql = "SELECT * FROM employee_payroll_service WHERE name = ?";
+			employeeStatement = connection.prepareStatement(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Usecase5: Implementing query to find employees joined between the particular
+	 * dates
+	 * 
+	 * @param start
+	 * @param end
+	 * @return
+	 * @throws DatabaseException
+	 */
+	public int getEmployeeForDateRange(LocalDate start, LocalDate end) throws DatabaseException {
+		String sql = String.format("Select * from employee_payroll_service where start between '%s' and '%s' ;",Date.valueOf(start), Date.valueOf(end));
+		List<Employee> employeeData = new ArrayList<>();
+		try (Connection connection = this.getConnection();) {
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(sql);
+			employeeData = this.getEmployeePayrollData(resultSet);
+		} catch (Exception exception) {
+			throw new DatabaseException("Unable to execute query");
+		}
+		return employeeData.size();
 	}
 }
 	
