@@ -87,5 +87,46 @@ public class EmployeePayrollDB {
 	public int updateEmployeeData(String name, double salary) throws DatabaseException {
 		return this.updateEmployeeUsingStatement(name, salary);
 	}
+	public List<Employee> getEmployeePayrollData(String name) {
+		List<Employee> employeePayrollList = null;
+		if (this.employeeStatement == null)
+			this.preparedStatementForEmployeeData();
+		try {
+			employeeStatement.setString(1, name);
+			ResultSet resultSet = employeeStatement.executeQuery();
+			employeePayrollList = this.getEmployeePayrollData(resultSet);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		return employeePayrollList;
+	}
+
+	private List<Employee> getEmployeePayrollData(ResultSet resultSet) {
+		List<Employee> employeePayrollList = new ArrayList<>();
+		try {
+			while (resultSet.next()) {
+				int id = resultSet.getInt("id");
+				String name = resultSet.getString("name");
+				double salary = resultSet.getDouble("salary");
+				LocalDate start = resultSet.getDate("start").toLocalDate();
+				employeePayrollList.add(new Employee(id, name, salary, start));
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return employeePayrollList;
+	}
+
+	private void preparedStatementForEmployeeData() {
+		try {
+			Connection connection = this.getConnection();
+			String sql = "SELECT * FROM employee_payroll_service WHERE name = ?";
+			employeeStatement = connection.prepareStatement(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }
 	
