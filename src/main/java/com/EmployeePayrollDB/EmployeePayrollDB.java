@@ -294,5 +294,115 @@ public class EmployeePayrollDB {
 		}
 	}
 
-}
+	/**
+	 * Usecase10: Adding the employee to the given department
+	 * 
+	 * @param name
+	 * @param gender
+	 * @param salary
+	 * @param start
+	 * @param department
+	 * @return
+	 * @throws DatabaseException
+	 * @throws SQLException 
+	 */
+	public Employee addEmployeeToDepartment(String name, String gender, double salary, LocalDate start,
+			String department) throws DatabaseException, SQLException {
+		Employee employee = addEmployeeToPayroll(name, gender, salary, start);
+		String sql = String.format(
+				"INSERT INTO department (employee_id,department_id, department_name) " + "VALUES ('%s','%s','%s')",
+				employee.id, 1, department);
+		try (Connection connection = this.getConnection()) {
+			Statement statement = connection.createStatement();
+			int rowAffected = statement.executeUpdate(sql);
+			if (rowAffected == 1) {
+				employee = new Employee(employee.id, name, salary, start, department);
+			}
+		} catch (SQLException e) {
+			throw new DatabaseException("Unable to add department details of  employee");
+		}
+		return employee;
+	}
 	
+	/**
+	 * Usecase7: Inserting new employee into the table using JDBC transaction
+	 * Usecase8: Inserting employee data in employee as well as payroll table
+	 * Usecase9: Adding the employee to the given department
+	 * Usecase11: Making all insertion as a single transaction
+	 */
+	 public Employee addEmployeeToPayrollAndDepartment(String name, String gender, double salary, LocalDate start,String department)
+			throws SQLException, DatabaseException {
+		int employeeId = -1;
+		Connection connection = null;
+		Employee employee = null;
+		try {
+			connection = this.getConnection();
+			connection.setAutoCommit(false);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try (Statement statement = connection.createStatement()) {
+			String sql = String.format("INSERT INTO employee_payroll_service (name, gender, salary, start) "
+					+ "VALUES ('%s','%s','%s','%s')", name, gender, salary, Date.valueOf(start));
+			int rowAffected = statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
+			if (rowAffected == 1) {
+				ResultSet resultSet = statement.getGeneratedKeys();
+				if (resultSet.next())
+					employeeId = resultSet.getInt(1);
+			}
+		} catch (SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException exception) {
+				exception.printStackTrace();
+			}
+			throw new DatabaseException("Unable to add new employee");
+		}
+		try (Statement statement = connection.createStatement()) {
+			double deductions = salary * 0.2;
+			double taxable_pay = salary - deductions;
+			double tax = taxable_pay * 0.1;
+			double netPay = salary - tax;
+			String sql = String.format(
+					"INSERT INTO payroll_details (employee_id, basic_pay, deductions, taxable_pay, tax, net_pay) "
+							+ "VALUES ('%s','%s','%s','%s','%s','%s')",
+					employeeId, salary, deductions, taxable_pay, tax, netPay);
+			statement.executeUpdate(sql);
+		} catch (SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException exception) {
+				exception.printStackTrace();
+			}
+			throw new DatabaseException("Unable to add payroll details of  employee");
+		}
+		try (Statement statement = connection.createStatement()) {
+			String sql = String.format(
+					"INSERT INTO department (employee_id,department_id, department_name) "
+							+ "VALUES ('%s','%s','%s')",
+					employeeId,1, department);
+			int rowAffected = statement.executeUpdate(sql);
+			if(rowAffected == 1) {
+				employee = new Employee(employeeId,name, salary, gender,start, department);
+			}
+		} catch (SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException exception) {
+				exception.printStackTrace();
+			}
+			throw new DatabaseException("Unable to add department details of  employee");
+		}
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (connection != null) {
+				connection.close();
+			}
+		}
+		return employee;
+	}
+}
+
