@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class EmployeePayrollService {
@@ -14,12 +15,15 @@ public class EmployeePayrollService {
 	};
 
 	private List<Employee> employeeList;
+	private EmployeePayrollDB employeePayrollDB;
 
 	public EmployeePayrollService(List<Employee> list) {
+		this();
 		this.employeeList = list;
 	}
 
 	public EmployeePayrollService() {
+		employeePayrollDB = EmployeePayrollDB.getInstance();
 	}
 
 	public static void main(String[] args) {
@@ -124,5 +128,25 @@ public class EmployeePayrollService {
 		int result  = employeePayrollDB.getEmployeeForDateRange(start,end);
 		return result;
 	}
+	
+	public Map<String, Double> getSalaryAverageByGender() throws DatabaseException {
+		return employeePayrollDB.getEmployeesByFunction("AVG");
+}
+public Map<String, Double> getSalarySumByGender() throws DatabaseException {
+	return employeePayrollDB.getEmployeesByFunction("SUM");
+}
+
+public Map<String, Double> getMinSalaryByGender() throws DatabaseException {
+	return employeePayrollDB.getEmployeesByFunction("MIN");
+}
+
+public Map<String, Double> getMaxSalaryByGender() throws DatabaseException {
+	return employeePayrollDB.getEmployeesByFunction("MAX");
+}
+
+public Map<String, Double> getCountByGender() throws DatabaseException {
+	return employeePayrollDB.getEmployeesByFunction("COUNT");
+}
+
 
 }
