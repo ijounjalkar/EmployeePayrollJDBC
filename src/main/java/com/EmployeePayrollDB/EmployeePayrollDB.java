@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.Driver;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,7 +17,19 @@ import java.util.stream.Collectors;
 
 public class EmployeePayrollDB {
 	
+	private PreparedStatement employeeStatement;
+	private static EmployeePayrollDB employeePayrollDB;
 
+	private EmployeePayrollDB() {
+	}
+
+	public static EmployeePayrollDB getInstance() {
+		if (employeePayrollDB == null) {
+			employeePayrollDB = new EmployeePayrollDB();
+		}
+		return employeePayrollDB;
+	}
+	
 	private Connection getConnection() throws SQLException {
 		String jdbcURL = "jdbc:mysql://localhost:3306/employee_payroll_service?useSSL=false";
 		String userName = "root";
