@@ -277,6 +277,22 @@ public class EmployeePayrollDB {
 		}
 		return employee;
 	}
+	/**
+	 * Usecase8: Performing the cascading delete on the employee table
+	 * 
+	 * @param name
+	 * @throws DatabaseException
+	 */
+	public void deleteEmployee(String name) throws DatabaseException {
+		String sql = String.format("DELETE from employee_payroll_service where name = '%s';", name);
+		try {
+			Connection connection = this.getConnection();
+			Statement statement = connection.createStatement();
+			statement.executeUpdate(sql);
+		} catch (SQLException exception) {
+			throw new DatabaseException("Unable to delete data");
+		}
+	}
 
 }
 	
