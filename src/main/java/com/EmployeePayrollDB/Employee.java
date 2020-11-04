@@ -9,7 +9,7 @@ public class Employee {
 	public String gender;
 	public String department;
 	private LocalDate start;
-
+	public boolean is_active = true;
 	public Employee(int id, String name, double salary) {
 		this.name = name;
 		this.id = id;

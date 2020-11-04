@@ -149,4 +149,16 @@ public class EmployeeServiceTest {
 		boolean result = employeePayrollService.checkEmployeeDataSync("Mark");
 		assertEquals(true, result);
 	}
+	/**
+	 * Usecase12: Remove employee from payroll
+	 * 
+	 * @throws DatabaseException
+	 * @throws SQLException 
+	 */
+	@Test
+	void givenEmployeeId_WhenRemoved_shouldReturnNumberOfActiveEmployees() throws DatabaseException, SQLException {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		List<Employee> onlyActiveList = employeePayrollService.removeEmployeeFromPayroll(3);
+		assertEquals(3, onlyActiveList.size());
+	}
 }

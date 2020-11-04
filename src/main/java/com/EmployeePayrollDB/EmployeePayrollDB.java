@@ -404,5 +404,22 @@ public class EmployeePayrollDB {
 		}
 		return employee;
 	}
+	 /**
+		 * Usecase12: Remove employee from the table
+		 * 
+		 * @param id
+		 * @return
+		 * @throws DatabaseException
+	     * @throws SQLException 
+		 */
+		public List<Employee> removeEmployeeFromCompany(int id) throws DatabaseException, SQLException {
+			List<Employee> listOfEmployees = this.readData();
+			listOfEmployees.forEach(employee -> {
+				if (employee.id == id) {
+					employee.is_active = false;
+				}
+			});
+			return listOfEmployees;
+		}
 }
 
