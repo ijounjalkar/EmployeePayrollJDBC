@@ -205,5 +205,78 @@ public class EmployeePayrollDB {
 		}
 		return aggregateFunctionMap;
 	}
+	/**
+	 * Usecase7: Inserting new employee into the table using JDBC transaction
+	 * Usecase8: Inserting employee data in employee as well as payroll table
+	 * 
+	 * @param name
+	 * @param gender
+	 * @param salary
+	 * @param start
+	 * @return
+	 * @throws SQLException
+	 * @throws DatabaseException
+	 */
+	public Employee addEmployeeToPayroll(String name, String gender, double salary, LocalDate start)
+			throws SQLException, DatabaseException {
+		int employeeId = -1;
+		Connection connection = null;
+		Employee employee = null;
+		try {
+			connection = this.getConnection();
+			connection.setAutoCommit(false);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try (Statement statement = connection.createStatement()) {
+			String sql = String.format("INSERT INTO employee_payroll_service (name, gender, salary, start) "
+					+ "VALUES ('%s','%s','%s','%s')", name, gender, salary, Date.valueOf(start));
+			int rowAffected = statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
+			if (rowAffected == 1) {
+				ResultSet resultSet = statement.getGeneratedKeys();
+				if (resultSet.next())
+					employeeId = resultSet.getInt(1);
+			}
+		} catch (SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException exception) {
+				exception.printStackTrace();
+			}
+			throw new DatabaseException("Unable to add new employee");
+		}
+		try (Statement statement = connection.createStatement()) {
+			double deductions = salary * 0.2;
+			double taxable_pay = salary - deductions;
+			double tax = taxable_pay * 0.1;
+			double netPay = salary - tax;
+			String sql = String.format(
+					"INSERT INTO payroll_details (employee_id, basic_pay, deductions, taxable_pay, tax, net_pay) "
+							+ "VALUES ('%s','%s','%s','%s','%s','%s')",
+					employeeId, salary, deductions, taxable_pay, tax, netPay);
+			int rowAffected = statement.executeUpdate(sql);
+			if (rowAffected == 1) {
+				employee = new Employee(employeeId, name, salary, start, gender);
+			}
+		} catch (SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException exception) {
+				exception.printStackTrace();
+			}
+			throw new DatabaseException("Unable to add payroll details of  employee");
+		}
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (connection != null) {
+				connection.close();
+			}
+		}
+		return employee;
+	}
+
 }
 	

@@ -6,20 +6,22 @@ public class Employee {
 	public String name;
 	public int id;
 	public double salary;
+	public String gender;
 	private LocalDate start;
 
 	public Employee(int id, String name, double salary) {
-		super();
 		this.name = name;
 		this.id = id;
 		this.salary = salary;
 	}
 
 	public Employee(int id, String name, double salary, LocalDate start) {
-		this.name = name;
-		this.id = id;
-		this.salary = salary;
+		this(id, name, salary);
 		this.start = start;
+	}
+	public Employee(int id, String name, double salary, LocalDate start, String gender) {
+		this(id, name, salary, start);
+		this.gender = gender;
 	}
 	
 	public boolean equals(Object obj) {
