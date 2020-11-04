@@ -119,4 +119,33 @@ public class EmployeeServiceTest {
 		boolean result = employeePayrollService.checkEmployeeDataSync("Mark");
 		assertEquals(true, result);
 	}
+	
+	/**
+	 * Usecase8: performing the cascading delete operation on database
+	 * 
+	 * @throws DatabaseException
+	 * @throws SQLException 
+	 */
+	@Test
+	public void givenEmployeeDB_WhenAnEmployeeIsDeleted_ShouldSyncWithDB() throws DatabaseException, SQLException {
+		EmployeePayrollService employeeService = new EmployeePayrollService();
+		employeeService.readEmployeePayrollData(IOService.DB_IO);
+		List<Employee> list = employeeService.deleteEmployee("Mark");
+		assertEquals(3, list.size());
+	}
+	
+	/**
+	 * Usecase10: Inserting data according to new database structure
+	 * 
+	 * @throws SQLException
+	 * @throws DatabaseException
+	 */
+	@Test
+	public void givenNewEmployee_WhenAddedToPayroll_ShouldBeAddedToDepartment() throws SQLException, DatabaseException {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		employeePayrollService.addEmployeeToDepartment("Mark", "M", 5000000.0, LocalDate.now(), "Sales");
+		boolean result = employeePayrollService.checkEmployeeDataSync("Mark");
+		assertEquals(true, result);
+	}
 }

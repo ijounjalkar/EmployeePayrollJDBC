@@ -277,6 +277,50 @@ public class EmployeePayrollDB {
 		}
 		return employee;
 	}
+	/**
+	 * Usecase8: Performing the cascading delete on the employee table
+	 * 
+	 * @param name
+	 * @throws DatabaseException
+	 */
+	public void deleteEmployee(String name) throws DatabaseException {
+		String sql = String.format("DELETE from employee_payroll_service where name = '%s';", name);
+		try {
+			Connection connection = this.getConnection();
+			Statement statement = connection.createStatement();
+			statement.executeUpdate(sql);
+		} catch (SQLException exception) {
+			throw new DatabaseException("Unable to delete data");
+		}
+	}
 
+	/**
+	 * Usecase10: Adding the employee to the given department
+	 * 
+	 * @param name
+	 * @param gender
+	 * @param salary
+	 * @param start
+	 * @param department
+	 * @return
+	 * @throws DatabaseException
+	 */
+	public Employee addEmployeeToDepartment(String name, String gender, double salary, LocalDate start,
+			String department) throws DatabaseException {
+		Employee employee = addEmployeeToPayroll(name, gender, salary, start);
+		String sql = String.format(
+				"INSERT INTO department (employee_id,department_id, department_name) " + "VALUES ('%s','%s','%s')",
+				employee.id, 1, department);
+		try (Connection connection = this.getConnection()) {
+			Statement statement = connection.createStatement();
+			int rowAffected = statement.executeUpdate(sql);
+			if (rowAffected == 1) {
+				employee = new Employee(employee.id, name, salary, start, department);
+			}
+		} catch (SQLException e) {
+			throw new DatabaseException("Unable to add department details of  employee");
+		}
+		return employee;
+	}
 }
-	
+
