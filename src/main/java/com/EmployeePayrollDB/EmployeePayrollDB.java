@@ -3,6 +3,7 @@ package com.EmployeePayrollDB;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -14,6 +15,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class EmployeePayrollDB {
+	
+	private PreparedStatement employeeStatement;
+	private static EmployeePayrollDB employeePayrollDB;
+
+	private EmployeePayrollDB() {
+	}
+
+	public static EmployeePayrollDB getInstance() {
+		if (employeePayrollDB == null) {
+			employeePayrollDB = new EmployeePayrollDB();
+		}
+		return employeePayrollDB;
+	}
 	
 
 	private Connection getConnection() throws SQLException {
