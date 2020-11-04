@@ -147,6 +147,8 @@ public Map<String, Double> getMaxSalaryByGender() throws DatabaseException {
 public Map<String, Double> getCountByGender() throws DatabaseException {
 	return employeePayrollDB.getEmployeesByFunction("COUNT");
 }
-
+public void addEmployeeToPayroll(String name, String gender, double salary, LocalDate start) throws SQLException, DatabaseException {
+	this.employeeList.add(employeePayrollDB.addEmployeeToPayroll(name, gender, salary, start));
+}
 
 }

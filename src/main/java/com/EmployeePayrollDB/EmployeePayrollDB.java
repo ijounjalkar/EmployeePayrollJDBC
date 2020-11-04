@@ -149,7 +149,7 @@ public class EmployeePayrollDB {
 	/**
 	 * Usecase4: Prepared Statement for the payroll database
 	 */
-	private void preparedStatementForEmployeeData() {
+	private void preparedStatementForEmployeeData1() {
 		try {
 			Connection connection = this.getConnection();
 			String sql = "SELECT * FROM employee_payroll_service WHERE name = ?";
